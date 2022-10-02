@@ -95,7 +95,7 @@ function relationTable() {
 	tableData.push(rowData);
 	for (let j = 0; j < depIds.length; ++ j) {
 	    const cell = createElement('td', row);
-	    if (i != j) rowData.push({
+	    if (i > j) rowData.push({
 		a: depIds[i],
 		b: depIds[j],
 		btn: specialButton(cell, jointId(depIds[i], depIds[j]))

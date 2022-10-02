@@ -1,3 +1,8 @@
+const pallete = [ "#a7dbd8", "#69d2e7", "#e0e4cc", "#f38630", "#fa6900", "#606060",
+		  "#0084ff", "#44bec7", "#ffc300", "#fa3c4c", "#d696bb", "#839e4d",
+		  "#cc8d6a", "#ba392e", "#54243a", "#79172d", "#606060"]; // https://codepen.io/banik/pen/WJaMLY
+let colorIndex = 0;
+
 function initCNVS(cnvs) {
     const ctx = cnvs.ctx;
     const stripWidth = cnvs.x / cnvs.columns;
@@ -17,12 +22,14 @@ function initCNVS(cnvs) {
 function drawDepartment(department, cnvs) {
     const stripWidth = cnvs.x / cnvs.columns;
     const stripHeight = department.size / stripWidth;
+    colorDepartment(department, cnvs);
     drawLabel(department, cnvs);
     if (stripHeight + cnvs.state.y > cnvs.y) {
 	const tempY = cnvs.state.y;
 	++ cnvs.state.i;
 	cnvs.state.y = 0;
 	cnvs.state.topToBtm = ! cnvs.state.topToBtm;
+	incfColorIndex(-1);
 	drawDepartment(new Department(
 	    department.id + "...",
 	    department.size - stripWidth * (cnvs.y - tempY),
@@ -33,6 +40,25 @@ function drawDepartment(department, cnvs) {
     }
 }
 
+function colorDepartment(department, cnvs) {
+    const ctx = cnvs.ctx;
+    const stripWidth = cnvs.x / cnvs.columns;
+    const stripHeight = department.size / stripWidth;
+    ctx.fillStyle = pallete[colorIndex];
+    ctx.fillRect(cnvs.state.i * stripWidth,
+		 cnvs.state.topToBtm ? cnvs.state.y : cnvs.y - cnvs.state.y,
+		 stripWidth,
+		 - ((-1) ** cnvs.state.topToBtm) * stripHeight);
+    initCNVS(cnvs);
+    incfColorIndex(1);
+}
+
+function incfColorIndex(i) {
+    while (i <= 0) i += pallete.length;
+    colorIndex += i;
+    colorIndex %= pallete.length;
+}
+
 function drawLabel(department, cnvs) {
     const delta = 5;
     const stripWidth = cnvs.x / cnvs.columns;
@@ -41,6 +67,7 @@ function drawLabel(department, cnvs) {
     const y = (cnvs.state.topToBtm
 	       ? cnvs.state.y + textMetric.actualBoundingBoxAscent + delta
 	       : cnvs.y - cnvs.state.y - delta);
+    cnvs.ctx.fillStyle = 'black';
     cnvs.ctx.fillText(department.id, x, y);
 }
 
